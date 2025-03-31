@@ -8,6 +8,9 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 
+import { Roboto, Noto_Sans_KR } from "next/font/google"; 
+import Menu from "@/components/menu";
+
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -18,9 +21,17 @@ export const metadata = {
   description: "The fastest way to build apps with Next.js and Supabase",
 };
 
-const geistSans = Geist({
+// Roboto와 Noto_Sans_KR 폰트 불러오기
+const roboto = Roboto({
   display: "swap",
   subsets: ["latin"],
+  weight: ["400", "700"], // 원하는 폰트 굵기 설정
+});
+
+const notoSansKR = Noto_Sans_KR({
+  display: "swap",
+  subsets: ["latin"], // 한국어 포함
+  weight: ["400", "700"], // 원하는 폰트 굵기 설정
 });
 
 export default function RootLayout({
@@ -28,8 +39,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  console.log(hasEnvVars)
+  console.log(hasEnvVars)
+  console.log(hasEnvVars)
+  console.log(hasEnvVars)
+
   return (
-    <html lang="en" className={geistSans.className} suppressHydrationWarning>
+    <html lang="en" className={roboto.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
@@ -39,12 +56,11 @@ export default function RootLayout({
         >
           <main className="min-h-screen flex flex-col items-center">
 
-
-            <div className="flex-1 w-full flex flex-col gap-20 items-center">
+            <div className="flex-1 w-full flex flex-col items-center">
               <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
                 <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
                   <div className="flex gap-5 items-center font-semibold">
-                    <Link href={"/"}>Next.js Supabase Starter</Link>
+                    <Link href={"/"}>Logo</Link>
                     <div className="flex items-center gap-2">
                       <DeployButton />
                     </div>
@@ -54,9 +70,9 @@ export default function RootLayout({
               </nav>
 
 
+              <Menu/>
 
-
-              <div className="flex flex-col gap-20 max-w-5xl p-5">
+              <div className="flex flex-col gap-5 max-w-5xl p-5">
                 {children}
               </div>
 
