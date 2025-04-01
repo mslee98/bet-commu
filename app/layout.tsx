@@ -40,11 +40,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  console.log(hasEnvVars)
-  console.log(hasEnvVars)
-  console.log(hasEnvVars)
-  console.log(hasEnvVars)
-
   return (
     <html lang="en" className={roboto.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
