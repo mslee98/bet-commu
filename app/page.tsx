@@ -8,23 +8,6 @@ import { createClient } from "@/utils/supabase/server";
 import BoardWidget from "@/components/board-widget";
 import RankWidget from "@/components/rank-widget";
 
-interface RankData {
-  id: number;
-  name: string;
-  logo: string;
-  banner: string;
-  url: string;
-  description: string;
-  affiliate_code: string | null;
-  support: string | null;
-  first_deposit_bonus: string | null;
-  slot_comp: number;
-  lost_amount_bonus: number | null;
-  created_at: string;
-  site_games: object[]; // or more specific type if you have data structure for this
-  reviews: object[]; // or more specific type if you have data structure for this
-}
-
 export default async function Home() {
 
   const supabase = await createClient();

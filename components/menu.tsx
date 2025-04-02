@@ -10,13 +10,13 @@ export default function Menu() {
                         <Link href="/" className="text-gray-900 dark:text-white hover:underline">홈</Link>
                     </li>
                     <li>
-                        <Link href="/ranking" className="text-gray-900 dark:text-white hover:underline">랭킹</Link>
+                        <Link href="/rank" className="text-gray-900 dark:text-white hover:underline">랭킹</Link>
                     </li>
                     <li>
                         <Link href="/board" className="text-gray-900 dark:text-white hover:underline">게시판</Link>
                     </li>
                     <li>
-                        <Link href="/about" className="text-gray-900 dark:text-white hover:underline">소개</Link>
+                        <Link href="/sites" className="text-gray-900 dark:text-white hover:underline">사이트</Link>
                     </li>
                 </ul>
             </nav>

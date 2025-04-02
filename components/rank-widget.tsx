@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from 'react';
+import Link from "next/link";
 
 const tabs = [
     { id: "firstCharge", label: "첫충전" },
@@ -53,6 +54,7 @@ export default function RankWidget({rankData}: RankWidgetProps) {
       }
     });
 
+
     setSortedRankData(sorted);
   };
 
@@ -88,6 +90,7 @@ export default function RankWidget({rankData}: RankWidgetProps) {
             <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-2">
+
                         <Image
                             src={sortedRankData[0]?.banner ? sortedRankData[0].banner : "https://images.unsplash.com/photo-1521747116042-5a810fda9664"}
                             alt={`${sortedRankData[0]?.name} 배너 이미지`}
@@ -118,56 +121,83 @@ export default function RankWidget({rankData}: RankWidgetProps) {
                                     </svg>
                                 </div>
                                 <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">(4.6)</p>
-                                <a href="#" className="text-sm font-medium leading-none text-gray-900 dark:text-white">{sortedRankData[0].reviews.length} </a>
+                                <Link href="#" className="text-sm font-medium leading-none text-gray-900 dark:text-white">{sortedRankData[0].reviews.length} </Link>
                             </div>
                         </div>
                             
-                        
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                            사이트에 대한 설명을 적는 란
+                        <div className="flex flex-wrap gap-2">
+                          {sortedRankData[0]?.site_games.map((game: any, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-gray-500 text-white text-xs font-semibold rounded-full"
+                            >
+                              {game?.games.name}
+                            </span>
+                          ))}
+                        </div>
+
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                          {sortedRankData[0].description}
                         </p>
                     </div>
                     
                     <div className="flex flex-col gap-4">
-                        {sortedRankData.slice(1,4).map((item:any, index:number) => (
-                            <div key={index} className="flex gap-4">
-                                <Image
-                                    src={item.banner}
-                                    alt={item.name}
-                                    width={100}
-                                    height={100}
-                                    className="w-24 h-24 rounded-lg object-cover"
-                                />
-                                <div className="flex-1">
-                                    <h3 className="text-sm text-gray-700 dark:text-gray-200 font-semibold">{item.name}</h3>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        설명란
-                                    </p>
-                                    <div className="mt-2 flex items-center gap-2 sm:mt-0">
-                                        <div className="flex items-center gap-0.5">
-                                            <svg className="h-4 w-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M13.849 4.22c-.684-1.626-3.014-1.626-3.698 0L8.397 8.387l-4.552.361c-1.775.14-2.495 2.331-1.142 3.477l3.468 2.937-1.06 4.392c-.413 1.713 1.472 3.067 2.992 2.149L12 19.35l3.897 2.354c1.52.918 3.405-.436 2.992-2.15l-1.06-4.39 3.468-2.938c1.353-1.146.633-3.336-1.142-3.477l-4.552-.36-1.754-4.17Z" />
-                                            </svg>
-                                            <svg className="h-4 w-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M13.849 4.22c-.684-1.626-3.014-1.626-3.698 0L8.397 8.387l-4.552.361c-1.775.14-2.495 2.331-1.142 3.477l3.468 2.937-1.06 4.392c-.413 1.713 1.472 3.067 2.992 2.149L12 19.35l3.897 2.354c1.52.918 3.405-.436 2.992-2.15l-1.06-4.39 3.468-2.938c1.353-1.146.633-3.336-1.142-3.477l-4.552-.36-1.754-4.17Z" />
-                                            </svg>
-                                            <svg className="h-4 w-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M13.849 4.22c-.684-1.626-3.014-1.626-3.698 0L8.397 8.387l-4.552.361c-1.775.14-2.495 2.331-1.142 3.477l3.468 2.937-1.06 4.392c-.413 1.713 1.472 3.067 2.992 2.149L12 19.35l3.897 2.354c1.52.918 3.405-.436 2.992-2.15l-1.06-4.39 3.468-2.938c1.353-1.146.633-3.336-1.142-3.477l-4.552-.36-1.754-4.17Z" />
-                                            </svg>
-                                            <svg className="h-4 w-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M13.849 4.22c-.684-1.626-3.014-1.626-3.698 0L8.397 8.387l-4.552.361c-1.775.14-2.495 2.331-1.142 3.477l3.468 2.937-1.06 4.392c-.413 1.713 1.472 3.067 2.992 2.149L12 19.35l3.897 2.354c1.52.918 3.405-.436 2.992-2.15l-1.06-4.39 3.468-2.938c1.353-1.146.633-3.336-1.142-3.477l-4.552-.36-1.754-4.17Z" />
-                                            </svg>
-                                            <svg className="h-4 w-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M13.849 4.22c-.684-1.626-3.014-1.626-3.698 0L8.397 8.387l-4.552.361c-1.775.14-2.495 2.331-1.142 3.477l3.468 2.937-1.06 4.392c-.413 1.713 1.472 3.067 2.992 2.149L12 19.35l3.897 2.354c1.52.918 3.405-.436 2.992-2.15l-1.06-4.39 3.468-2.938c1.353-1.146.633-3.336-1.142-3.477l-4.552-.36-1.754-4.17Z" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">(4.6)</p>
-                                        <a href="#" className="text-sm font-medium leading-none text-gray-900 dark:text-white">{rankData[0].reviews.length} </a>
-                                    </div>
-                                    
-                                </div>
+                      {sortedRankData.slice(1, 4).map((item: any, index: number) => (
+                        <div key={index} className="flex gap-4">
+                          <Image
+                            src={item.banner}
+                            alt={item.name}
+                            width={100}
+                            height={100}
+                            className="w-24 h-24 rounded-lg object-cover"
+                          />
+                          <div className="flex flex-col flex-1"> {/* 변경: flex-1 적용 */}
+                            
+                            <div className="flex items-center">
+                              <h3 className="text-sm text-gray-700 dark:text-gray-200 font-semibold mr-2">{item.name}</h3>
+                              
+                              <div className="flex flex-wrap gap-2">
+                              {item.site_games.map((games:any, index:number) => (
+
+                                <span
+                                  key={index}
+                                  className="px-1 py-0.5 bg-gray-500 text-white text-xs rounded-full"
+                                >
+                                  {games.games.name}
+                                </span>
+                              ))}
+                              
+                              </div>
+                            
                             </div>
-                        ))}
+                            <p className="text-xs text-gray-500 dark:text-gray-400 flex-1"> {/* 변경: flex-1 적용 */}
+                              {item.description}
+                            </p>
+                            <div className="mt-auto flex items-center gap-2"> {/* 변경: mt-auto 추가 */}
+                              <div className="flex items-center gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                  <svg
+                                    key={i}
+                                    className="h-4 w-4 text-yellow-300"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M13.849 4.22c-.684-1.626-3.014-1.626-3.698 0L8.397 8.387l-4.552.361c-1.775.14-2.495 2.331-1.142 3.477l3.468 2.937-1.06 4.392c-.413 1.713 1.472 3.067 2.992 2.149L12 19.35l3.897 2.354c1.52.918 3.405-.436 2.992-2.15l-1.06-4.39 3.468-2.938c1.353-1.146.633-3.336-1.142-3.477l-4.552-.36-1.754-4.17Z" />
+                                  </svg>
+                                ))}
+                              </div>
+                              <p className="text-sm font-medium leading-none text-gray-500 dark:text-gray-400">(4.6)</p>
+                              <a href="#" className="text-sm font-medium leading-none text-gray-900 dark:text-white">
+                                {rankData[0].reviews.length}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                 
                 </div>
