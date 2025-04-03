@@ -21,6 +21,7 @@ export default async function Home() {
             banner,
             url,
             description,
+            summary,
             affiliate_code,
             support,
             first_deposit_bonus,

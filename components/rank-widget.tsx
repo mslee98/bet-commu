@@ -18,6 +18,7 @@ interface RankData {
     banner: string;
     url: string;
     description: string;
+    summary: string;
     affiliate_code: string | null;
     support: string | null;
     first_deposit_bonus: string | null;
@@ -137,7 +138,7 @@ export default function RankWidget({rankData}: RankWidgetProps) {
                         </div>
 
                         <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                          {sortedRankData[0].description}
+                          {sortedRankData[0]?.summary}
                         </p>
                     </div>
                     
@@ -171,7 +172,7 @@ export default function RankWidget({rankData}: RankWidgetProps) {
                             
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 flex-1"> {/* 변경: flex-1 적용 */}
-                              {item.description}
+                              {item.summary}
                             </p>
                             <div className="mt-auto flex items-center gap-2"> {/* 변경: mt-auto 추가 */}
                               <div className="flex items-center gap-0.5">
@@ -253,7 +254,7 @@ export default function RankWidget({rankData}: RankWidgetProps) {
 
       {/* 더보기 버튼 */}
       <div className="text-center mt-4">
-        <button className="text-purple-600 dark:text-purple-400 font-semibold">더보기 &gt;</button>
+        <Link className="text-purple-600 dark:text-purple-400 font-semibold" href={"/sites"}>더보기 &gt;</Link>
       </div>
     </div>
   );

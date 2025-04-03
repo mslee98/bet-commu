@@ -1,9 +1,88 @@
+'use client'
 
+import Link from 'next/link';
 import { useState } from 'react';
+import { createClient } from "@/utils/supabase/client";
 
-export default function ReviewList() { 
+interface ReviewListProps {
+    siteId?: number;
+    siteName?: string;
+    reviewCriteria?: { id: number; name: string }[] | null;
+  }
+
+export default function ReviewList({siteId, siteName, reviewCriteria}: ReviewListProps) { 
 
     const [isWriteModalOpen, setIsWriteModalOpen ] = useState(false);
+
+    const [ratings, setRatings] = useState<{ [key: number]: number }>({});
+    const [reviewText, setReviewText] = useState("");
+
+    const handleRatingChange = (criteriaId: number, rating: number) => {
+        setRatings((prev) => ({ ...prev, [criteriaId]: rating }));
+      };
+
+      const handleSubmit = async (e: any) => {
+        e.preventDefault();
+    
+        if (!reviewText.trim()) {
+          alert("리뷰 내용을 입력해야 합니다.");
+          return;
+        }
+    
+        try {
+            console.log(ratings);
+            console.log(reviewText);
+
+            const supabase = createClient();
+
+            // 현재 로그인한 사용자 정보 가져오기
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            if (userError || !user) {
+                alert("로그인이 필요합니다.");
+                return;
+            }
+
+            // 1. 리뷰 테이블 (reviews)에 데이터 삽입
+                const { data: reviewData, error: reviewError } = await supabase
+                .from("reviews")
+                .insert([
+                    {
+                        site_id: siteId,
+                        user_id: user.id,
+                        comment: reviewText,
+                    },
+                ])
+                .select("id")
+                .single(); // 삽입 후 review_id 가져오기
+
+            if (reviewError) {
+                throw reviewError;
+            }
+
+            const reviewId = reviewData.id;
+
+            // 2. 개별 평가 항목 (review_ratings) 저장
+            const ratingEntries = Object.entries(ratings).map(([criteriaId, rating]) => ({
+                review_id: reviewId,
+                criteria_id: parseInt(criteriaId),
+                rating: rating,
+            }));
+
+            const { error: ratingError } = await supabase
+                .from("review_ratings")
+                .insert(ratingEntries);
+
+            if (ratingError) {
+                throw ratingError;
+            }
+    
+          alert("리뷰가 성공적으로 등록되었습니다!");
+          setIsWriteModalOpen(false);
+        } catch (error) {
+          console.error("리뷰 작성 오류:", error);
+          alert("리뷰 작성 중 오류가 발생했습니다.");
+        }
+      };
 
     return (
         <>
@@ -412,49 +491,90 @@ export default function ReviewList() {
                             {/* <!-- Modal header --> */}
                             <div className="flex items-center justify-between rounded-t border-b border-gray-200 p-4 dark:border-gray-700 md:p-5">
                                 <div>
-                                <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">Add a review for:</h3>
-                                <a href="#" className="font-medium text-primary-700 hover:underline dark:text-primary-500">Apple iMac 24" All-In-One Computer, Apple M1, 8GB RAM, 256GB SSD</a>
+                                <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">리뷰 작성</h3>
+                                <Link href="#" className="font-medium text-primary-700 hover:underline dark:text-primary-500">{siteName}</Link>
                                 </div>
+                                
+                                
                                 <button onClick={() => setIsWriteModalOpen(false)} type="button" className="absolute right-5 top-5 ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="review-modal">
                                     <svg className="h-3 w-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                                     </svg>
                                     <span className="sr-only">닫기</span>
                                 </button>
+
+
+
                             </div>
                             {/* <!-- Modal body --> */}
-                            <form className="p-4 md:p-5">
+                            <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                                 <div className="mb-4 grid grid-cols-2 gap-4">
                                 <div className="col-span-2">
                                     <div className="flex items-center">
-                                    <svg className="h-6 w-6 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {reviewCriteria?.map((criteria) => (
+                                            <div key={criteria.id} className="col-span-2">
+                                            <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                                                {criteria.name}
+                                            </label>
+                                            <div className="flex items-center gap-3">
+                                                <div className="grid grid-cols-5 gap-2">
+                                                {Array.from({ length: 5 }, (_, index) => (
+                                                    <svg
+                                                    key={index}
+                                                    onClick={() => handleRatingChange(criteria.id, index + 1)}
+                                                    className={`h-6 w-6 cursor-pointer ${
+                                                        index < (ratings[criteria.id] || 0) ? "text-yellow-300" : "text-gray-300 dark:text-gray-500"
+                                                    }`}
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 22 20"
+                                                    >
+                                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                                                    </svg>
+                                                ))}
+                                                </div>
+                                                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                                                {ratings[criteria.id] || 0}
+                                                </span>
+                                            </div>
+                                            </div>
+                                        ))}
+                                        </div>
+
+                                    {/* {Array.from({ length: 5 }, (_, index) => (
+                                        <svg
+                                        key={index}
+                                        onClick={() => setRating(index + 1)} // 클릭하면 해당 인덱스까지 별 채우기
+                                        className={`h-6 w-6 cursor-pointer ${
+                                            index < rating ? "text-yellow-300" : "text-gray-300 dark:text-gray-500"
+                                        }`}
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 22 20"
+                                        >
                                         <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                    </svg>
-                                    <svg className="ms-2 h-6 w-6 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                    </svg>
-                                    <svg className="ms-2 h-6 w-6 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                    </svg>
-                                    <svg className="ms-2 h-6 w-6 text-gray-300 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                    </svg>
-                                    <svg className="ms-2 h-6 w-6 text-gray-300 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                                    </svg>
-                                    <span className="ms-2 text-lg font-bold text-gray-900 dark:text-white">3.0 out of 5</span>
+                                        </svg>
+                                    ))} */}
+                                    {/* <span className="ms-2 text-lg font-bold text-gray-900 dark:text-white">{rating} out of 5</span> */}
+                                    
                                     </div>
                                 </div>
-                                <div className="col-span-2">
+
+                                {/* <div className="col-span-2">
                                     <label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Review title</label>
                                     <input type="text" name="title" id="title" className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500" required={true} />
-                                </div>
+                                </div> */}
+                                
                                 <div className="col-span-2">
-                                    <label htmlFor="description" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Review description</label>
-                                    <textarea id="description" rows={6} className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500" required={true}></textarea>
+                                    <label htmlFor="description" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">리뷰 내용</label>
+                                    <textarea id="description" rows={6} onChange={(e) => setReviewText(e.target.value)} className="mb-2 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500" required={true}></textarea>
                                     <p className="ms-auto text-xs text-gray-500 dark:text-gray-400">Problems with the product or delivery? <a href="#" className="text-primary-600 hover:underline dark:text-primary-500">Send a report</a>.</p>
                                 </div>
-                                <div className="col-span-2">
+
+                                {/* <div className="col-span-2">
                                     <p className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Add real photos of the product to help other customers <span className="text-gray-500 dark:text-gray-400">(Optional)</span></p>
                                     <div className="flex w-full items-center justify-center">
                                     <label htmlFor="dropzone-file" className="dark:hover:bg-bray-800 flex h-52 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600">
@@ -468,17 +588,18 @@ export default function ReviewList() {
                                         <input id="dropzone-file" type="file" className="hidden" />
                                     </label>
                                     </div>
-                                </div>
+                                </div> */}
+
                                 <div className="col-span-2">
                                     <div className="flex items-center">
                                     <input id="review-checkbox" type="checkbox" value="" className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600" />
-                                    <label htmlFor="review-checkbox" className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">By publishing this review you agree with the <a href="#" className="text-primary-600 hover:underline dark:text-primary-500">terms and conditions</a>.</label>
+                                    <label htmlFor="review-checkbox" className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">이 리뷰를 게시함으로써 귀하는 이용 약관에 동의하게 됩니다.</label>
                                     </div>
                                 </div>
                                 </div>
                                 <div className="border-t border-gray-200 pt-4 dark:border-gray-700 md:pt-5">
-                                    <button type="submit" className="me-2 inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Add review</button>
-                                    <button onClick={() => setIsWriteModalOpen(false)} type="button" data-modal-toggle="review-modal" className="me-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700">Cancel</button>
+                                    <button type="submit" className="me-2 inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">리뷰 작성</button>
+                                    <button onClick={() => setIsWriteModalOpen(false)} type="button" data-modal-toggle="review-modal" className="me-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700">취소</button>
                                 </div>
                             </form>
                             </div>

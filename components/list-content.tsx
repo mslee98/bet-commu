@@ -6,7 +6,7 @@ export default function ListContent({item}: any) {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
 
             <div className="h-56 w-full">
-                <Link href={`/sites/${item.name}`}>
+                <Link href={`/sites/${item.name}-${item.id}`}>
                     <img className="mx-auto h-full dark:hidden" src="https://images.unsplash.com/photo-1521747116042-5a810fda9664" alt="" />
                     <img className="mx-auto hidden h-full dark:block" src="https://images.unsplash.com/photo-1521747116042-5a810fda9664" alt="" />
                 </Link>
@@ -37,7 +37,7 @@ export default function ListContent({item}: any) {
                     </div>
                 </div>
 
-                <a href="#" className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{item.name}</a>
+                <Link href={`/sites/${item.name}-${item.id}`} className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">{item.name}</Link>
 
                 <div className="mt-2 flex items-center gap-2">
                     <div className="flex items-center">
