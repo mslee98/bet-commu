@@ -53,10 +53,22 @@ export default async function Home() {
   return (
     <>
       <RankWidget rankData={rankData}/>
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <BoardWidget/>
         <BoardWidget/>
       </div>
+      <div className="hidden md:flex h-screen w-full flex-col items-center justify-center rounded-lg p-6 dark:bg-slate-900">
+        <div className="grid h-full w-full grid-cols-3 grid-rows-6 gap-4">
+          <div className="col-span-2 row-span-3 rounded-3xl bg-orange-400"></div>
+          <div className="row-span-4 rounded-3xl bg-orange-400"></div>
+          <div className="row-span-3 rounded-3xl bg-orange-400"></div>
+          <div className="row-span-3 rounded-3xl bg-orange-400"></div>
+          <div className="row-span-2 rounded-3xl bg-orange-400"></div>
+        </div>
+      </div>
+
+
+
       {/* <main className="flex-1 flex flex-col gap-6 px-4">
         <h2 className="font-medium text-xl mb-4">Next steps</h2>
         {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}

@@ -1,3 +1,5 @@
+'use client'
+
 import { signUpAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
@@ -6,18 +8,11 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
-/**
- * 
- * @param props 
- * @returns 
- * 
- * 이거 어차피 다시 만들어야 할 듯? 항목 더 추가해서 작업해야하니
- */
 export default async function Signup(props: {
   searchParams: Promise<Message>;
 }) {
   const searchParams = await props.searchParams;
-
+  
   if ("message" in searchParams) {
     return (
       <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">

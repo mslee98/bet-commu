@@ -66,18 +66,23 @@ export default function RankWidget({rankData}: RankWidgetProps) {
   };
 
   return (
-    <div className="mx-auto w-full bg-white dark:bg-gray-900 p-5 rounded-xl shadow-lg dark:shadow-gray-800">
+    <div className="w-full bg-white dark:bg-gray-900 p-5 rounded-xl shadow-lg dark:shadow-gray-800">
       
       {/* 탭 메뉴 */}
       <div className="flex border-b border-gray-300 dark:border-gray-700">
-        {tabs && tabs.map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`flex-1 py-2 text-center text-lg font-semibold ${
-              activeTab === tab.id
-                ? "text-purple-600 border-b-2 border-purple-600 dark:text-purple-400 dark:border-purple-400"
-                : "text-gray-400 dark:text-gray-500"
-            }`}
+            className={`
+              flex-1 py-2 text-center font-medium transition 
+              md:text-lg md:font-semibold 
+              text-sm whitespace-nowrap 
+              ${
+                activeTab === tab.id
+                  ? "text-purple-600 border-b-2 border-purple-600 dark:text-purple-400 dark:border-purple-400"
+                  : "text-gray-400 dark:text-gray-500"
+              }
+            `}
             onClick={() => handleTabClick(tab.id)}
           >
             {tab.label}
@@ -89,16 +94,17 @@ export default function RankWidget({rankData}: RankWidgetProps) {
       <div className="mt-4">
         {sortedRankData && sortedRankData.length > 0 ? (
             <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="md:col-span-2">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div className="lg:col-span-2">
 
-                        <Image
-                            src={sortedRankData[0]?.banner ? sortedRankData[0].banner : "https://images.unsplash.com/photo-1521747116042-5a810fda9664"}
-                            alt={`${sortedRankData[0]?.name} 배너 이미지`}
-                            width={500}
-                            height={300}
-                            className="w-full h-48 md:h-64 rounded-lg object-cover"
-                        />
+                      <Image
+                        src={sortedRankData[0]?.banner || "https://images.unsplash.com/photo-1521747116042-5a810fda9664"}
+                        alt={`${sortedRankData[0]?.name} 배너 이미지`}
+                        width={600}
+                        height={300}
+                        className="w-full max-w-full h-auto rounded-lg object-cover"
+                      />
+
                         <div className="flex justify-between items-align">
                             <h3 className="text-sm text-gray-700 dark:text-gray-200 font-semibold mt-2">
                                 {sortedRankData[0].name}
@@ -130,7 +136,7 @@ export default function RankWidget({rankData}: RankWidgetProps) {
                           {sortedRankData[0]?.site_games.map((game: any, index) => (
                             <span
                               key={index}
-                              className="px-3 py-1 bg-gray-500 text-white text-xs font-semibold rounded-full"
+                              className="text-xs font-semibold rounded-full"
                             >
                               {game?.games.name}
                             </span>
@@ -152,25 +158,26 @@ export default function RankWidget({rankData}: RankWidgetProps) {
                             height={100}
                             className="w-24 h-24 rounded-lg object-cover"
                           />
-                          <div className="flex flex-col flex-1"> {/* 변경: flex-1 적용 */}
+                          <div className="flex flex-col"> {/* 변경: flex-1 적용 */}
                             
                             <div className="flex items-center">
                               <h3 className="text-sm text-gray-700 dark:text-gray-200 font-semibold mr-2">{item.name}</h3>
-                              
-                              <div className="flex flex-wrap gap-2">
+                            
+                            
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2">
                               {item.site_games.map((games:any, index:number) => (
 
                                 <span
                                   key={index}
-                                  className="px-1 py-0.5 bg-gray-500 text-white text-xs rounded-full"
+                                  className="text-xs rounded-full"
                                 >
                                   {games.games.name}
                                 </span>
                               ))}
-                              
-                              </div>
-                            
                             </div>
+
                             <p className="text-xs text-gray-500 dark:text-gray-400 flex-1"> {/* 변경: flex-1 적용 */}
                               {item.summary}
                             </p>

@@ -44,14 +44,22 @@ export default async function SiteList() {
         `);
 
     return (
-        <div className="w-[62rem] 2xl:px-0">
+        <div className="w-full 2xl:px-0">
             <ListHeader/>
 
-            <div className="mb-4 grid gap-2 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-3">
+            {/* <div className="mb-4 grid gap-2 sm:grid-cols-1 md:mb-8 lg:grid-cols-3 xl:grid-cols-3">
+            
+                {rankData?.map((item) => (
+                    <ListContent key={item.id} item={item} />
+                ))}
+            </div> */}
+
+            <div className="mb-4 grid grid-cols-1 gap-2 md:mb-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
                 {rankData?.map((item) => (
                     <ListContent key={item.id} item={item} />
                 ))}
             </div>
+
 
         </div>
     );
