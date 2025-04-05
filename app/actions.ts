@@ -6,10 +6,22 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const signUpAction = async (formData: FormData) => {
+
   const email = formData.get("email")?.toString();
+  const nickname = formData.get("nickname")?.toString() as string;
   const password = formData.get("password")?.toString();
+  const confirmPassword = formData.get("confirmPassword")?.toString() as string;
+
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
+
+  if(password !== confirmPassword) {
+    return encodedRedirect(
+      "error",
+      "/sign-up",
+      "비밀번호가 일치하지 않습니다.",
+    );
+  }
 
   if (!email || !password) {
     return encodedRedirect(
@@ -23,7 +35,11 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      // 현재는 이메일 인증을 off 상태라 주석처리 안하면 회원가입만 해도 자동 로그인이 되어버림
+      // emailRedirectTo: `${origin}/auth/callback`,
+      data: {
+        nickname,
+      }
     },
   });
 
@@ -34,7 +50,7 @@ export const signUpAction = async (formData: FormData) => {
     return encodedRedirect(
       "success",
       "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
+      "회원가입이 완료되었습니다!",
     );
   }
 };

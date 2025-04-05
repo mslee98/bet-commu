@@ -8,6 +8,9 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 // import SEO from '../next-seo.config'
 
 import { Roboto, Noto_Sans_KR } from "next/font/google"; 
@@ -54,6 +57,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <ToastContainer/>
           <main className="min-h-screen flex flex-col items-center">
 
             <div className="flex-1 w-full flex flex-col items-center">
